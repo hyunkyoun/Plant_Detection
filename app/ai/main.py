@@ -102,6 +102,5 @@ def predict_species(image_path):
     
     print(f"This image most likely belongs to {predicted_class[np.argmax(score)]} with a {100 * np.max(score):.2f} percent confidence.")
 
-
 image_path = './test/1'
 predict_species(image_path)

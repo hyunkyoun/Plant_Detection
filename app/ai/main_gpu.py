@@ -7,8 +7,11 @@ import os
 import json
 
 # Running/Training in parallel to speed up processes
-gpus = tf.config.list_physical_devices()
-print(gpus)
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# print(gpus)
+
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+print("GPU Details:", tf.config.list_physical_devices('GPU'))
 
 # if gpus:
 #   # Restrict TensorFlow to only use the first GPU
