@@ -128,20 +128,3 @@ print("GPU Details:", tf.config.list_physical_devices('GPU'))
 # plt.legend()
 # plt.title('Model Loss')
 # plt.show()
-
-# # Loads image, preprocesses, and uses trained model to predict species -> prints results and confidence score
-# def predict_species(image_path):
-#     img = tf.keras.preprocessing.image.load_img(image_path, target_size=(img_height, img_width))
-#     img_array = tf.keras.preprocessing.image.img_to_array(img)
-#     img_array = tf.expand_dims(img_array, 0)
-    
-#     predictions = model.predict(img_array)
-#     score = tf.nn.softmax(predictions[0])
-    
-#     predicted_class = train_gen.class_indices
-#     predicted_class = {v: k for k, v in predicted_class.items()}
-    
-#     print(f"This image most likely belongs to {predicted_class[np.argmax(score)]} with a {100 * np.max(score):.2f} percent confidence.")
-    
-#     # Also prints out the top 5 predicitons...
-#     #...

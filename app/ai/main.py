@@ -66,8 +66,8 @@ history = model.fit(
     train_gen,
     steps_per_epoch=train_gen.samples // batch_size,
     epochs=epochs,
-    # validation_data=validate_gen,
-    # validation_steps=validate_gen.samples // batch_size
+    validation_data=validate_gen,
+    validation_steps=validate_gen.samples // batch_size
 )
 
 # Save model
@@ -77,30 +77,13 @@ model.save('mushroom_plant_classifier.h5')
 # Plot results 
 plt.figure(figsize=(12, 4))
 plt.subplot(1, 2, 1)
-# plt.plot(history.history['accuracy'], label='Training Accuracy')
-# plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.plot(history.history['accuracy'], label='Training Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
 plt.legend()
 plt.title('Model Accuracy')
 plt.subplot(1, 2, 2)
-# plt.plot(history.history['loss'], label='Training Loss')
-# plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.legend()
 plt.title('Model Loss')
 plt.show()
-
-# Loads image, preprocesses, and uses trained model to predict species -> prints results and confidence score
-def predict_species(image_path):
-    img = tf.keras.preprocessing.image.load_img(image_path, target_size=(img_height, img_width))
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0)
-    
-    predictions = model.predict(img_array)
-    score = tf.nn.softmax(predictions[0])
-    
-    predicted_class = train_gen.class_indices
-    predicted_class = {v: k for k, v in predicted_class.items()}
-    
-    print(f"This image most likely belongs to {predicted_class[np.argmax(score)]} with a {100 * np.max(score):.2f} percent confidence.")
-
-image_path = './test/1'
-predict_species(image_path)
