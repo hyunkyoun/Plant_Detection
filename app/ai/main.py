@@ -6,9 +6,20 @@ import numpy as np
 import os
 import json
 
+# Running/Training in parallel to speed up processes
+gpus = tf.config.experimental.list_phyical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        print(e)
+
 # Parameters for image 
 img_height, img_width =  224, 224   # image dimensions
-batch_size = 32     # choose batch size for training
+batch_size = 32 * len(gpus)    # choose batch size for training
 epochs = 20     # number of training epochs
 
 # Data generators
@@ -50,22 +61,26 @@ with open('species_labels.json', 'w') as f:
     json.dump(species_labels, f)
 
 # Architecture of model 
-model = models.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Flatten(),
-    layers.Dense(64, activation='relu'),
-    layers.Dense(len(species_labels), activation='softmax')
+def build_model(num_classes):
+    model = models.Sequential([
+        layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Flatten(),
+        layers.Dense(64, activation='relu'),
+        layers.Dense(num_classes, activation='softmax')
 ])
 
-# Compiles Model
-model.compile(optimizer='adam',
+# Compile a GPU-model
+strategy = tf.distribute.MirroedStrategy()
+with strategy.scope():
+    model = build_model(len(species_labels))
+    model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
