@@ -4,6 +4,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import json
 
 # Parameters for image 
 img_height, img_width =  224, 224   # image dimensions
@@ -40,6 +41,14 @@ validate_gen = train_data.flow_from_directory(
     subset='training'
 )
 
+# Create directory to map class incides to species name
+class_indices = train_gen.class_indices
+species_labels = {v: k for k, v in class_indices.items()}
+
+# Save species label with JSON
+with open('species_labels.json', 'w') as f:
+    json.dump(species_labels, f)
+
 # Architecture of model 
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
@@ -52,7 +61,7 @@ model = models.Sequential([
     layers.MaxPooling2D((2, 2)),
     layers.Flatten(),
     layers.Dense(64, activation='relu'),
-    layers.Dense(train_gen.num_classes, activation='softmax')
+    layers.Dense(len(species_labels), activation='softmax')
 ])
 
 # Compiles Model
@@ -99,3 +108,6 @@ def predict_species(image_path):
     predicted_class = {v: k for k, v in predicted_class.items()}
     
     print(f"This image most likely belongs to {predicted_class[np.argmax(score)]} with a {100 * np.max(score):.2f} percent confidence.")
+    
+    # Also prints out the top 5 predicitons...
+    #...
