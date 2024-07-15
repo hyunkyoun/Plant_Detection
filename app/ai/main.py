@@ -24,7 +24,7 @@ train_data = ImageDataGenerator(
 
 # Feeding batches of images and corresponding labels to model during training
 # Also path to dataset
-train_gen = train_datagen_dir(
+train_gen = train_data.flow_from_directory(
     '', # put path here
     target_size=(img_height, img_width),
     batch_size=batch_size,
@@ -32,7 +32,7 @@ train_gen = train_datagen_dir(
     subset='training'
 )
 
-validate_gen = train_datagen_dir(
+validate_gen = train_data.flow_from_directory(
     '', # put path here
     target_size=(img_height, img_width),
     batch_size=batch_size,
