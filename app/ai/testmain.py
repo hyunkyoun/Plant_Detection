@@ -10,8 +10,8 @@ import numpy as np
 import os
 
 # Parameters for image 
-img_height, img_width =  180, 180   # image dimensions
-batch_size = 32     # choose batch size for training
+img_height, img_width =  240, 240   # image dimensions
+batch_size = 64     # choose batch size for training
 epochs = 50     # number of training epochs
 
 # Data generators
@@ -56,6 +56,22 @@ validate_gen = train_data.flow_from_directory(
     subset='training'
 )
 
+train_ds = tf.data.Dataset.from_generator(
+    lambda: train_gen,
+    output_signature=(
+        tf.TensorSpec(shape=(None, img_height, img_width, 3), dtype=tf.float32),
+        tf.TensorSpec(shape=(None, train_gen.num_classes), dtype=tf.float32)
+    )
+).repeat()
+
+validate_ds = tf.data.Dataset.from_generator(
+    lambda: validate_gen,
+    output_signature=(
+        tf.TensorSpec(shape=(None, img_height, img_width, 3), dtype=tf.float32),
+        tf.TensorSpec(shape=(None, validate_gen.num_classes), dtype=tf.float32)
+    )
+).repeat()
+
 # Architecture of model 
 def build_model():
     model = models.Sequential([
@@ -76,6 +92,8 @@ def build_model():
         layers.Dropout(0.3),
         layers.Dense(train_gen.num_classes, activation='softmax')
     ])
+
+    return model
 
 # def build_model():
 #     model = models.Sequential([
@@ -127,16 +145,16 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 
 # Training model
 history = model.fit(
-    train_gen,
+    train_ds,
     steps_per_epoch=train_gen.samples // batch_size,
     epochs=epochs,
-    validation_data=validate_gen,
+    validation_data=validate_ds,
     validation_steps=validate_gen.samples // batch_size,
     callbacks=[lr_scheduler, early_stopping]
 )
 
 # Save model
-model.save('v4_flower.keras')
+model.save('v7_flower.keras')
 
 # Plot results 
 plt.figure(figsize=(12, 4))
