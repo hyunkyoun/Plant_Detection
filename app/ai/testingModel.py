@@ -3,9 +3,11 @@ import os
 import json
 import numpy as np
 
-model_path = 'mushroom_plant_classifier.h5'
+model_path = 'v4_flowers.keras'
 img_height, img_width =  224, 224   # image dimensions
-model = tf.keras.models.load_model(model_path)
+model = (model_path)
+
+model.summary()
 
 model.compile(optimizer='adam',
               loss='categorical_crossentropy',
