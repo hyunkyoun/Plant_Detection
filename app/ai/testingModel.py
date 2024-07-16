@@ -3,9 +3,9 @@ import os
 import json
 import numpy as np
 
-model_path = 'v4_flowers.keras'
-img_height, img_width =  224, 224   # image dimensions
-model = (model_path)
+model_path = 'v4_flower.keras'
+img_height, img_width =  299, 299   # image dimensions
+model = tf.keras.models.load_model(model_path)
 
 model.summary()
 
