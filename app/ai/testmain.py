@@ -11,7 +11,7 @@ import os
 
 # Parameters for image 
 img_height, img_width =  240, 240   # image dimensions
-batch_size = 64     # choose batch size for training
+batch_size = 32     # choose batch size for training
 epochs = 50     # number of training epochs
 
 # Data generators
@@ -75,17 +75,18 @@ validate_ds = tf.data.Dataset.from_generator(
 # Architecture of model 
 def build_model():
     model = models.Sequential([
-        layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
+        layers.Input(shape=(img_height, img_width, 3)),
+        layers.Conv2D(32, (3, 3), activation='relu'),
         layers.MaxPooling2D((2, 2)),
         layers.Conv2D(64, (3, 3), activation='relu'),
         layers.MaxPooling2D((2, 2)),
         layers.Conv2D(64, (3, 3), activation='relu'),
         layers.MaxPooling2D((2, 2)),
         layers.Conv2D(64, (3, 3), activation='relu'),
-        # layers.MaxPooling2D((2, 2)),
-        # layers.Conv2D(128, (3, 3), activation='relu'),  # Added convolutional layer
-        # layers.MaxPooling2D((2, 2)),                    # Added pooling layer
-        # layers.Conv2D(128, (3, 3), activation='relu'),  # Another added convolutional layer
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(128, (3, 3), activation='relu'),  # Added convolutional layer
+        layers.MaxPooling2D((2, 2)),                    # Added pooling layer
+        layers.Conv2D(128, (3, 3), activation='relu'),  # Another added convolutional layer
         layers.MaxPooling2D((2, 2)),        
         layers.Flatten(),
         layers.Dense(64, activation='relu'),
