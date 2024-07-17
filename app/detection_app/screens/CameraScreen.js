@@ -1,10 +1,9 @@
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
 
 export default function App({navigation}) {
   const [facing, setFacing] = useState('back');
@@ -30,6 +29,13 @@ export default function App({navigation}) {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
 
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      console.log(photo)
+    }
+  }
+
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={facing}>
@@ -47,7 +53,7 @@ export default function App({navigation}) {
           <View style={styles.camera_button_container}>
 
             {/* take picture button */}
-            <TouchableOpacity style={styles.shutter}>
+            <TouchableOpacity style={styles.shutter} onPress={takePicture}>
               <Entypo name="picasa" size={50} color="white" />
             </TouchableOpacity>
 
