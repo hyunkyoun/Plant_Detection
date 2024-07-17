@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import json
-
+tf.config.list_physical_devices('GPU')
 # Running/Training in parallel to speed up processes
 # gpus = tf.config.experimental.list_physical_devices('GPU')
 # print(gpus)
