@@ -5,13 +5,14 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import RandomCrop, Resizing
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 
 # Parameters for image 
-img_height, img_width =  240, 240   # image dimensions
-batch_size = 64     # choose batch size for training
+img_height, img_width =  350, 350   # image dimensions
+batch_size = 32     # choose batch size for training
 epochs = 50     # number of training epochs
 
 # Data generators
@@ -32,7 +33,7 @@ train_data = ImageDataGenerator(
     width_shift_range=0.2,
     height_shift_range=0.2,
     shear_range=0.2,
-    zoom_range=0.2,
+    zoom_range=0.3,
     horizontal_flip=True,
     vertical_flip=True,
     fill_mode='nearest'
@@ -72,28 +73,30 @@ validate_ds = tf.data.Dataset.from_generator(
     )
 ).repeat()
 
-# Architecture of model 
-def build_model():
-    model = models.Sequential([
-        layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
-        # layers.MaxPooling2D((2, 2)),
-        # layers.Conv2D(128, (3, 3), activation='relu'),  # Added convolutional layer
-        # layers.MaxPooling2D((2, 2)),                    # Added pooling layer
-        # layers.Conv2D(128, (3, 3), activation='relu'),  # Another added convolutional layer
-        layers.MaxPooling2D((2, 2)),        
-        layers.Flatten(),
-        layers.Dense(64, activation='relu'),
-        layers.Dropout(0.3),
-        layers.Dense(train_gen.num_classes, activation='softmax')
-    ])
+# # Architecture of model 
+# def build_model():
+#     model = models.Sequential([
+#         RandomCrop(180, 180), # Random cropping to simulate zoom ins
+#         Resizing(img_height, img_width), # Resizing back to original
+#         layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
+#         layers.MaxPooling2D((2, 2)),
+#         layers.Conv2D(64, (3, 3), activation='relu'),
+#         layers.MaxPooling2D((2, 2)),
+#         layers.Conv2D(64, (3, 3), activation='relu'),
+#         layers.MaxPooling2D((2, 2)),
+#         layers.Conv2D(64, (3, 3), activation='relu'),
+#         # layers.MaxPooling2D((2, 2)),
+#         # layers.Conv2D(128, (3, 3), activation='relu'),  # Added convolutional layer
+#         # layers.MaxPooling2D((2, 2)),                    # Added pooling layer
+#         # layers.Conv2D(128, (3, 3), activation='relu'),  # Another added convolutional layer
+#         layers.MaxPooling2D((2, 2)),        
+#         layers.Flatten(),
+#         layers.Dense(64, activation='relu'),
+#         layers.Dropout(0.3),
+#         layers.Dense(train_gen.num_classes, activation='softmax')
+#     ])
 
-    return model
+#     return model
 
 # def build_model():
 #     model = models.Sequential([
@@ -117,6 +120,39 @@ def build_model():
 #         layers.Dense(train_gen.num_classes, activation='softmax')
 #     ])
 #     return model
+
+def inception_module(x, filters):
+    # 1x1 conv
+    conv1x1 = layers.Conv2D(filters, (1, 1), padding='same', activation='relu')(x)
+    
+    # 3x3 conv
+    conv3x3 = layers.Conv2D(filters, (3, 3), padding='same', activation='relu')(x)
+    
+    # 5x5 conv
+    conv5x5 = layers.Conv2D(filters, (5, 5), padding='same', activation='relu')(x)
+    
+    # 3x3 max pooling
+    pool = layers.MaxPooling2D((3, 3), strides=(1, 1), padding='same')(x)
+    pool = layers.Conv2D(filters, (1, 1), padding='same', activation='relu')(pool)
+    
+    # Concatenate all branches
+    output = layers.Concatenate()([conv1x1, conv3x3, conv5x5, pool])
+    return output
+
+def build_model():
+    inputs = layers.Input(shape=(img_height, img_width, 3))
+    x = layers.Conv2D(32, (3, 3), activation='relu')(inputs)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = inception_module(x, 64)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = inception_module(x, 128)
+    x = layers.GlobalAveragePooling2D()(x)
+    x = layers.Dense(64, activation='relu')(x)
+    x = layers.Dropout(0.3)(x)
+    outputs = layers.Dense(train_gen.num_classes, activation='softmax')(x)
+    
+    model = models.Model(inputs=inputs, outputs=outputs)
+    return model
 
 model = build_model()
 
