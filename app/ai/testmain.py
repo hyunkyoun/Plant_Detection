@@ -11,7 +11,7 @@ import numpy as np
 import os
 
 # Parameters for image 
-img_height, img_width =  350, 350   # image dimensions
+img_height, img_width =  240,240   # image dimensions
 batch_size = 32     # choose batch size for training
 epochs = 50     # number of training epochs
 
@@ -190,7 +190,7 @@ history = model.fit(
 )
 
 # Save model
-model.save('v7_flower.keras')
+model.save('v8_flower.keras')
 
 # Plot results 
 plt.figure(figsize=(12, 4))

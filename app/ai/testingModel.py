@@ -3,7 +3,7 @@ import os
 import json
 import numpy as np
 
-model_path = 'v7_flower.keras'
+model_path = 'v8_flower.keras'
 img_height, img_width =  240, 240  # image dimensions
 model = tf.keras.models.load_model(model_path)
 
