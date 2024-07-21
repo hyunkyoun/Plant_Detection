@@ -2,11 +2,20 @@ import tensorflow as tf
 import os
 import json
 import numpy as np
+from tensorflow.keras.models import load_model
 
-model_path = 'v8_flower.keras'
-img_height, img_width =  240, 240  # image dimensions
-model = tf.keras.models.load_model(model_path)
+model_path = 'v9_flower.keras'
+img_dimensions = 240
+img_height, img_width =  img_dimensions, img_dimensions  # image dimensions
 
+
+
+if os.path.isfile(model_path):
+    print("File exists")
+    model = load_model(model_path)
+else:
+    print("File not found")
+    
 model.summary()
 
 model.compile(optimizer='adam',

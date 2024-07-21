@@ -41,6 +41,7 @@ if gpus:
 img_height, img_width =  300, 300  # image dimensions
 batch_size = 32     # choose batch size for training
 epochs = 50     # number of training epochs
+tf.random.set_seed(42)
 
 # Data generators
 train_data = ImageDataGenerator(
@@ -91,7 +92,7 @@ validate_ds = tf.data.Dataset.from_generator(
 
 # Create options object
 options = tf.data.Options()
-options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.OFF
 
 # Apply options to both datasets
 train_ds = train_ds.with_options(options)
@@ -190,11 +191,11 @@ with strategy.scope():
     
 # Training model
 history = model.fit(
-    train_gen,
-    steps_per_epoch=train_gen.samples // batch_size,
+    train_ds,
+    steps_per_epoch=train_ds.samples // batch_size,
     epochs=epochs,
-    validation_data=validate_gen,
-    validation_steps=validate_gen.samples // batch_size,
+    validation_data=validate_ds,
+    validation_steps=validate_ds.samples // batch_size,
     callbacks=[lr_scheduler, early_stopping]
 )
 
