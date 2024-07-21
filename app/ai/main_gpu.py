@@ -192,10 +192,10 @@ with strategy.scope():
 # Training model
 history = model.fit(
     train_ds,
-    steps_per_epoch=train_ds.samples // batch_size,
+    steps_per_epoch=train_gen.samples // batch_size,
     epochs=epochs,
     validation_data=validate_ds,
-    validation_steps=validate_ds.samples // batch_size,
+    validation_steps=validate_gen.samples // batch_size,
     callbacks=[lr_scheduler, early_stopping]
 )
 
