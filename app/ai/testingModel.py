@@ -4,11 +4,9 @@ import json
 import numpy as np
 from tensorflow.keras.models import load_model
 
-model_path = 'v9_flower.keras'
+model_path = 'v7_flower.keras'
 img_dimensions = 240
 img_height, img_width =  img_dimensions, img_dimensions  # image dimensions
-
-
 
 if os.path.isfile(model_path):
     print("File exists")
@@ -53,7 +51,7 @@ def predict_species(image_path, i):
     predicted_species = species_labels[str(predicted_class)]
     confidence = 100 * np.max(score)
 
-    print(f"This image ({i}) most likely belongs to the species: {predicted_species}")
+    print(f"\nThis image ({i}) most likely belongs to the species: {predicted_species}")
     print(f"Confidence: {confidence:.2f}%")
 
     top_5_indices = np.argsort(score)[-5:][::-1]
@@ -64,7 +62,7 @@ def predict_species(image_path, i):
         print(f"{species}: {confidence:.2f}%")
 
 
-NUMBER_OF_TESTS = 10
+NUMBER_OF_TESTS = 11
 
 for i in range(NUMBER_OF_TESTS):
     predict_species(f'test/{i + 1}.jpg', i + 1)

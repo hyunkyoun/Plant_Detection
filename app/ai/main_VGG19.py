@@ -62,7 +62,7 @@ train_gen = train_data.flow_from_directory(
 )
 
 validate_gen = train_data.flow_from_directory(
-    './models/testing',
+    './models/validation',
     target_size=(img_height, img_width),
     batch_size=batch_size,
     class_mode='categorical',
