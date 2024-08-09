@@ -17,6 +17,13 @@ const CameraScreen = ({ navigation }) => {
   const [image, setImage] = useState(null);
   const cameraRef = useRef();
   const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  let species = '';
+  let confidence = 0.0;
+
+  const IP_ADDRESS = 'http://172.16.11.183';
+    const PORT = '5001';
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -44,7 +51,7 @@ const CameraScreen = ({ navigation }) => {
         const photo = await cameraRef.current.takePictureAsync();
         setImage(photo.uri);
       } catch(e) {
-        console.log(e);
+        console.error(e);
       }
     }
   }
@@ -54,7 +61,6 @@ const CameraScreen = ({ navigation }) => {
   }
 
   const sendToModel = async () => {
-
     const formData = new FormData();
     formData.append('file', {
       uri: image,
@@ -63,12 +69,23 @@ const CameraScreen = ({ navigation }) => {
     });
 
     try {
-        const response = await axios.post("http://192.168.1.49:5000/api/sendToModel", formData, {
+        const response = await axios.post(`${IP_ADDRESS}:${PORT}/api/sendToModel`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
         console.log('Response: ', response.data);
+
+        const responseData = response.data;
+
+        // Get the first key (species name) and its value (confidence)
+        [species, confidence] = Object.entries(responseData)[0];
+
+        console.log(`Predicted species: ${species}`);
+        console.log(`Confidence: ${confidence}`);
+
+        navigation.navigate('Results', {species, confidence});
+
     } catch(error) {
         console.error('Error connecting to server', error);
     };

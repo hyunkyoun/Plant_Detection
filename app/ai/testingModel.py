@@ -62,7 +62,7 @@ def predict_species(image_path, i):
         print(f"{species}: {confidence:.2f}%")
 
 
-NUMBER_OF_TESTS = 11
+NUMBER_OF_TESTS = 12
 
 for i in range(NUMBER_OF_TESTS):
     predict_species(f'test/{i + 1}.jpg', i + 1)

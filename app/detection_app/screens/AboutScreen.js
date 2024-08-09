@@ -3,13 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import axios from 'axios';
 
-// import { checkServer } from '../src/api';
-
 const AboutScreen = ({navigation}) => {
   const checkServer = async () => {
+    const IP_ADDRESS = 'http://172.16.11.183';
+    const PORT = '5001';
+
     try {
-        const response = await axios.get("http://192.168.1.49:5000/", {
-            timeout: 5000,
+        const response = await axios.get(`${IP_ADDRESS}:${PORT}`, {
+          timeout: 5000,
         });
         console.log('Response: ', response.data);
     } catch(error) {
