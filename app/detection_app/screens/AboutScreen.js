@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const AboutScreen = ({navigation}) => {
   const checkServer = async () => {
-    const IP_ADDRESS = 'http://172.16.11.183';
+    const IP_ADDRESS = 'http://192.168.1.49';
     const PORT = '5001';
 
     try {
