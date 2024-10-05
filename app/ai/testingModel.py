@@ -4,8 +4,8 @@ import json
 import numpy as np
 from tensorflow.keras.models import load_model
 
-model_path = 'v7_flower.keras'
-img_dimensions = 240
+model_path = 'v10_flower.keras'
+img_dimensions = 224
 img_height, img_width =  img_dimensions, img_dimensions  # image dimensions
 
 if os.path.isfile(model_path):
@@ -23,7 +23,7 @@ model.compile(optimizer='adam',
 
 def predict_species(image_path, i):
     # Load the species labels
-    if not os.path.exists(image_path):
+    if not os.path.exists(image_path): 
         print(f"Error: Image file not found at {image_path}")
         return
      
